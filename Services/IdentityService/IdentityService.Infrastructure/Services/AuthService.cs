@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using IdentityService.Application.DTOs.Auth;
 using IdentityService.Application.Interfaces;
 using IdentityService.Domain.Entities;
+using IdentityService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,10 +22,12 @@ namespace IdentityService.Application.Services
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
-        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+        private readonly AppDbContext _context;
+        public AuthService(UserManager<ApplicationUser> userManager, IConfiguration configuration, AppDbContext context)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _context = context;
         }
         public async Task<RegisterResponseDto> RegisterAsync(RegisterRequestDto request)
         {
@@ -73,15 +77,79 @@ namespace IdentityService.Application.Services
                 Message = "Invalid credentials"
             };
             
-            var token  =await GenerateJwtToken(user);
+            var accessToken  = await GenerateJwtToken(user);
+            var refreshToken = GenerateRefreshToken()!;
+
+            var refreshEntity = new RefreshToken
+            {
+                Token = refreshToken,
+                UserId = user.Id,
+                ExpireDate = DateTime.UtcNow.AddDays(7)
+            };
+            await _context.RefreshTokens.AddAsync(refreshEntity);
+            await _context.SaveChangesAsync();
 
             return new LoginResponseDto
             {
                 IsSuccess = true,
-                Token = token,
+                 Token = new TokenResponseDto
+                 {
+                     AccessToken = accessToken,
+                     RefreshToken = refreshToken
+                 },
                 Message = $"Login Seccessful {user.Email}"
             };
         }
+
+        public async Task<LoginResponseDto> RefreshToken(string refreshToken)
+        {
+            var userRefreshToken = await _context.RefreshTokens.Include(a => a.User).FirstOrDefaultAsync(a => a.Token == refreshToken);
+            if (userRefreshToken == null) return new LoginResponseDto
+            {
+                IsSuccess = false,
+                Message = "Refresh Token not valid"
+            };
+            if (userRefreshToken.IsRevoked) return new LoginResponseDto
+            {
+                IsSuccess = false,
+                Message = "Refresh Token Invoke"
+            };
+            if (userRefreshToken.ExpireDate < DateTime.UtcNow) return new LoginResponseDto
+            {
+                IsSuccess = false,
+                Message = "Refresh Token Expire"
+            };
+
+            var AccessToken = await GenerateJwtToken(userRefreshToken.User!);
+            var newRefreshToken = GenerateRefreshToken()!;
+
+            userRefreshToken.IsRevoked = true;
+
+            var refreshEntity = new RefreshToken
+            {
+                Token = newRefreshToken,
+                UserId = userRefreshToken.UserId,
+                ExpireDate = DateTime.UtcNow.AddDays(7)
+            };
+            await _context.RefreshTokens.AddAsync(refreshEntity);
+            await _context.SaveChangesAsync();
+
+            return new LoginResponseDto
+            {
+                IsSuccess = true,
+                Message = "Refresh Token Generated",
+                Token = new TokenResponseDto
+                {
+                    AccessToken = AccessToken,
+                    RefreshToken = newRefreshToken
+                }
+            };
+            }
+
+           
+
+
+
         private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -105,6 +173,10 @@ namespace IdentityService.Application.Services
                 expires: DateTime.UtcNow.AddMinutes(expiry),
                 signingCredentials : credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private string GenerateRefreshToken()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

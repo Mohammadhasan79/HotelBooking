@@ -32,6 +32,16 @@ namespace IdentityService.Api.Controllers
             if(!result.IsSuccess) return BadRequest(result);
             return Ok(result);
         }
+        [HttpPut("[action]")]
+        public async Task<IActionResult> RefreshToken(string refreshToken)
+        {
+            var result = await _authService.RefreshToken(refreshToken);
+
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
+        }
+
+
         [Authorize]
         [HttpGet("me")]
         public IActionResult Me()

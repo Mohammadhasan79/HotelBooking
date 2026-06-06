@@ -1,5 +1,8 @@
 using System.Text;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 using IdentityService.Api.Controllers;
+using IdentityService.Application.Validators;
 using IdentityService.Infrastructure;
 using IdentityService.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
+using IdentityService.Api.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +76,12 @@ builder.Services
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(AuthController).Assembly);
 
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDtoValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestDtoValidator>();
+
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
 
@@ -93,6 +103,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
