@@ -49,6 +49,7 @@ namespace IdentityService.Application.Services
                 Message = string.Join(",",
                     result.Errors.Select(x => x.Description))
             };
+            await _userManager.AddToRoleAsync(user, "Customer");
 
             return new RegisterResponseDto
             {
@@ -72,7 +73,7 @@ namespace IdentityService.Application.Services
                 Message = "Invalid credentials"
             };
             
-            var token  = GenerateJwtToken(user);
+            var token  =await GenerateJwtToken(user);
 
             return new LoginResponseDto
             {
@@ -81,8 +82,9 @@ namespace IdentityService.Application.Services
                 Message = $"Login Seccessful {user.Email}"
             };
         }
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtToken(ApplicationUser user)
         {
+            var roles = await _userManager.GetRolesAsync(user);
             var secret = _configuration["JwtSettings:Secret"];
             var issuer = _configuration["JwtSettings:Issuer"];
             var audience = _configuration["JwtSettings:Audience"];
@@ -92,6 +94,7 @@ namespace IdentityService.Application.Services
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.Name, user.UserName!)
             };
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

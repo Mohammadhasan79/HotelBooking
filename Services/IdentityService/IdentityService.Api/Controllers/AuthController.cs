@@ -38,5 +38,11 @@ namespace IdentityService.Api.Controllers
         {
             return Ok("You are authenticated");
         }
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin-panel")]
+        public IActionResult AdminPanel()
+        {
+            return Ok("Welcome Admin");
+        }
     }
 }

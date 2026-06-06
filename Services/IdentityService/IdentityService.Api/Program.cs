@@ -1,7 +1,9 @@
 using System.Text;
 using IdentityService.Api.Controllers;
 using IdentityService.Infrastructure;
+using IdentityService.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
@@ -81,6 +83,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager =
+        scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
+
+    await RoleSeeder.SeedAsync(roleManager);
+}
+
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
