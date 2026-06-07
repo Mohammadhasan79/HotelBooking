@@ -40,19 +40,5 @@ namespace IdentityService.Api.Controllers
             if (!result.IsSuccess) return BadRequest(result);
             return Ok(result);
         }
-
-
-        [Authorize]
-        [HttpGet("me")]
-        public IActionResult Me()
-        {
-            return Ok("You are authenticated");
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpGet("admin-panel")]
-        public IActionResult AdminPanel()
-        {
-            return Ok("Welcome Admin");
-        }
     }
 }
