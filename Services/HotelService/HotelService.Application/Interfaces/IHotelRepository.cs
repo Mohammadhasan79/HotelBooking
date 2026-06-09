@@ -11,6 +11,8 @@ namespace HotelService.Application.Interfaces
     public interface IHotelRepository
     {
         Task AddAsync(Hotel hotel);
+        void Update(Hotel hotel);
+        void Delete(Hotel hotel);
         Task<List<Hotel>> GetAllAsync();
         Task<Hotel> GetByIdAsync(int id);
         Task SaveChangesAsync();    

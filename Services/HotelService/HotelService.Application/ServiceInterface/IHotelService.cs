@@ -11,6 +11,8 @@ namespace HotelService.Application.ServiceInterface
     public interface IHotelService
     {
         Task<Result<HotelDto>> CreateAsync(CreateHotelDto dto);
+        Task<Result<HotelDto>> DeleteAsync(int id);
+        Task<Result<HotelDto>> UpdateAsync(int id, UpdateHotelDto dto);
         Task<Result<List<HotelDto>>> GetAllAsync();
         Task<Result<HotelDto>> GetByIdAsync(int id);
     }

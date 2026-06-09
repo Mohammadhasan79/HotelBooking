@@ -14,6 +14,7 @@ namespace HotelService.Application.Mappings
         public HotelProfile()
         {
             CreateMap<CreateHotelDto, Hotel>();
+            CreateMap<UpdateHotelDto, Hotel>();
             CreateMap<Hotel, HotelDto>();  
         }
     }

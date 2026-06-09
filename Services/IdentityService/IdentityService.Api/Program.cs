@@ -45,8 +45,7 @@ builder.Services.AddSwaggerGen(options =>
         });
 });
 
-var secret =
-    builder.Configuration["JwtSettings:Secret"];
+var secret = builder.Configuration["JwtSettings:Secret"];
 
 builder.Services
     .AddAuthentication(
@@ -79,8 +78,6 @@ builder.Services.AddControllers()
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestDtoValidator>();
-builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestDtoValidator>();
-
 
 builder.Services.AddInfrastructure(builder.Configuration);
 

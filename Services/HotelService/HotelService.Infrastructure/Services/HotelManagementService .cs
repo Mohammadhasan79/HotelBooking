@@ -45,5 +45,32 @@ namespace HotelService.Infrastructure.Services
 
                 return Result<HotelDto>.Ok(_mapper.Map<HotelDto>(hotel));
         }
+        public async Task<Result<HotelDto>> UpdateAsync(int id, UpdateHotelDto dto)
+        {
+            if (dto == null) return Result<HotelDto>.Fail("Data Entry is Null");
+
+            var hotel = await _repository.GetByIdAsync(id);
+
+            if (hotel == null) return Result<HotelDto>.Fail("This Hotel Not Exist");
+
+            var hotelUpdate =_mapper.Map(dto, hotel);
+
+            _repository.Update(hotelUpdate);
+            await _repository.SaveChangesAsync();
+
+            return Result<HotelDto>.Ok(_mapper.Map<HotelDto>(hotelUpdate));
+        }
+        public async Task<Result<HotelDto>> DeleteAsync(int id)
+        {
+            var hotel = await _repository.GetByIdAsync(id);
+
+            if (hotel == null) return Result<HotelDto>.Fail("This Hotel Not Exist");
+
+            _repository.Delete(hotel);
+            await _repository.SaveChangesAsync();
+
+            return Result<HotelDto>.Ok(_mapper.Map<HotelDto>(hotel));
+        }
     }
 }
+

@@ -14,14 +14,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.6" />
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="9.0.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HotelService.Application\HotelService.Application.csproj" />
-    <ProjectReference Include="..\HotelService.Infrastructure\HotelService.Infrastructure.csproj" />
+    <ProjectReference Include="..\RoomService.Application\RoomService.Application.csproj" />
+    <ProjectReference Include="..\RoomService.Infrastructure\RoomService.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

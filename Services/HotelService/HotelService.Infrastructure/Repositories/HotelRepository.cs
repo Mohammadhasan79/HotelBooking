@@ -17,6 +17,14 @@ public class HotelRepository : IHotelRepository
         await _context.Hotels.AddAsync(hotel);
     }
 
+    public void Update(Hotel hotel)
+    {
+        _context.Hotels.Update(hotel);
+    }
+    public void Delete(Hotel hotel)
+    {
+        _context.Hotels.Remove(hotel);
+    }
 
     public async Task<List<Hotel>> GetAllAsync()
     {
