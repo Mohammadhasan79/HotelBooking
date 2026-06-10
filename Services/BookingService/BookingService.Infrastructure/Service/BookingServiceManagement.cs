@@ -97,9 +97,25 @@ namespace BookingService.Infrastructure.Service
         }
 
 
+        public async Task<Result> CancelAsync(int bookingId, string userId)
+        {
+            var booking = await _repository.GetByIdAsync(bookingId);
+
+            if (booking == null) return Result.Fail("Reserve Not Exist");
+
+            if (booking.UserId != userId) return Result.Fail("Access Denied");
+
+            booking.Status = BookingStatus.Cancelled;
+
+            await _repository.SaveChangesAsync();
+            return Result.Ok("Reserve Cancelled");
+        }
+
+
         private bool HasDateConflict(Booking existingBooking, CreateBookingDto dto)
         {
             return dto.CheckInDate < existingBooking.CheckOutDate && dto.CheckOutDate > existingBooking.CheckInDate;
         }
+        
     }
 }

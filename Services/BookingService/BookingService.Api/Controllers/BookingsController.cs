@@ -58,7 +58,20 @@ namespace BookingService.Api.Controllers
 
             return Ok(result);
         }
+        [Authorize]
+        [HttpDelete("{id}/cancel")]
+        public async Task<IActionResult> Cancel(int id)
+        {
+            var userId = GetUserId();
 
+            if (userId == null) return Unauthorized();
+
+            var result = await _bookingService.CancelAsync(id, userId);
+
+            if (!result.Success) return NotFound(result);
+
+            return Ok(result);
+        }
 
         private string GetUserId()
         {
