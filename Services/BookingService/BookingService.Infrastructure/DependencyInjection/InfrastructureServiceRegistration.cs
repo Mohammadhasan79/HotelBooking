@@ -32,6 +32,7 @@ namespace BookingService.Infrastructure.DependencyInjection
                     client.BaseAddress =
                         new Uri("https://localhost:7289/");
                 });
+            services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
             return services;
         }
     }

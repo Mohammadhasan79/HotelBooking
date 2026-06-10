@@ -10,6 +10,7 @@ using BookingService.Application.RepositoryInterface;
 using BookingService.Application.ServiceInterface;
 using BookingService.Domain.Entities;
 using BookingService.Domain.Enums;
+using Shared.Contracts.Events;
 
 namespace BookingService.Infrastructure.Service
 {
@@ -18,15 +19,18 @@ namespace BookingService.Infrastructure.Service
         private readonly IBookingRepository _repository;
         private readonly IRoomApiClient _roomApiClient;
         private readonly IMapper _mapper;
+        private readonly IMessagePublisher _publisher;
 
         public BookingServiceManagement(
             IBookingRepository repository,
             IRoomApiClient roomApiClient,
-            IMapper mapper)
+            IMapper mapper,
+            IMessagePublisher publisher)
         {
             _repository = repository;
             _roomApiClient = roomApiClient;
             _mapper = mapper;
+            _publisher = publisher;
         }
 
         public async Task<Result<List<BookingDto>>> GetAllAsync()
@@ -84,6 +88,21 @@ namespace BookingService.Infrastructure.Service
             await _repository.AddAsync(newBooking);
 
             await _repository.SaveChangesAsync();
+
+            var bookingCreatedEvent = new BookingCreatedEvent
+                {
+                    BookingId = newBooking.Id,
+
+                    UserId = newBooking.UserId,
+
+                    RoomId = newBooking.RoomId,
+
+                    TotalPrice = newBooking.TotalPrice,
+
+                    CreatedAt = newBooking.CreatedAt
+                };
+
+            _publisher.Publish(bookingCreatedEvent);
 
             return Result<BookingDto>.Ok(_mapper.Map<BookingDto>(newBooking));
 
