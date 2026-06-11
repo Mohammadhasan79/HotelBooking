@@ -102,7 +102,7 @@ namespace BookingService.Infrastructure.Service
                     CreatedAt = newBooking.CreatedAt
                 };
 
-            _publisher.Publish(bookingCreatedEvent);
+            await _publisher.Publish(bookingCreatedEvent);
 
             return Result<BookingDto>.Ok(_mapper.Map<BookingDto>(newBooking));
 

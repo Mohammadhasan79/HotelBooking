@@ -16,9 +16,7 @@ public class RoomApiClient : IRoomApiClient
     public async Task<bool> RoomExistAsync(
         int roomId)
     {
-        var response =
-            await _httpClient.GetAsync(
-                $"api/rooms/{roomId}");
+        var response = await _httpClient.GetAsync($"api/rooms/{roomId}");
 
         return response.IsSuccessStatusCode;
     }
@@ -26,21 +24,14 @@ public class RoomApiClient : IRoomApiClient
     public async Task<decimal> GetRoomPriceAsync(
         int roomId)
     {
-        var response =
-            await _httpClient.GetAsync(
-                $"api/rooms/{roomId}");
+        var response = await _httpClient.GetAsync($"api/rooms/{roomId}");
 
-        if (!response.IsSuccessStatusCode)
-            throw new Exception("Room not found");
+        if (!response.IsSuccessStatusCode) throw new Exception("Room not found");
 
-        var json =
-            await response.Content
-                .ReadAsStringAsync();
+        var json = await response.Content.ReadAsStringAsync();
 
-        var room =
-            JsonSerializer.Deserialize<
-                RoomResponse>(json,
-                new JsonSerializerOptions
+        var room = JsonSerializer.Deserialize<RoomResponse>(json,
+            new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
