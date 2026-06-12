@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Domain", "Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PaymentService.Infrastructure", "Services\PaymentService\PaymentService.Infrastructure\PaymentService.Infrastructure.csproj", "{B93F9E10-12B8-4A02-A2E7-4751143C0724}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway", "ApiGateway\ApiGateway.csproj", "{F6615B7E-FA82-49F0-A959-C8D3614517F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -319,6 +321,18 @@ Global
 		{B93F9E10-12B8-4A02-A2E7-4751143C0724}.Release|x64.Build.0 = Release|Any CPU
 		{B93F9E10-12B8-4A02-A2E7-4751143C0724}.Release|x86.ActiveCfg = Release|Any CPU
 		{B93F9E10-12B8-4A02-A2E7-4751143C0724}.Release|x86.Build.0 = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|x64.Build.0 = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|x64.ActiveCfg = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|x64.Build.0 = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|x86.ActiveCfg = Release|Any CPU
+		{F6615B7E-FA82-49F0-A959-C8D3614517F9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
