@@ -33,6 +33,7 @@ namespace BookingService.Infrastructure.DependencyInjection
                         new Uri("https://localhost:7289/");
                 });
             services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
+
             return services;
         }
     }

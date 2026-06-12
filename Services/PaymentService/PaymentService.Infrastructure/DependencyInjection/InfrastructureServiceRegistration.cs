@@ -7,8 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PaymentService.Application.Interfaces;
+using PaymentService.Infrastructure.Message;
 using PaymentService.Infrastructure.Persistence;
 using PaymentService.Infrastructure.Repository;
+using PaymentService.Infrastructure.Services;
 
 namespace PaymentService.Infrastructure.DependencyInjection
 {
@@ -25,6 +27,8 @@ namespace PaymentService.Infrastructure.DependencyInjection
                     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
                 });
             services.AddScoped<IPaymentRepository, PaymentRepository>();
+            services.AddScoped<IPaymentService, PaymentServiceManagement>();
+            services.AddScoped<IMessagePublisher,RabbitMqPublisher>();
             return services;
         }
     }

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using BookingService.Application.Validator;
+using BookingService.Infrastructure.Messaging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,7 @@ builder.Services
             };
     });
 
+builder.Services.AddHostedService<PaymentCompletedConsumer>();
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(BookingsController).Assembly);

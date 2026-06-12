@@ -15,5 +15,6 @@ namespace BookingService.Application.ServiceInterface
         Task<Result<BookingDto?>> GetByIdAsync(int id);
         Task<Result<List<BookingDto>>> GetMyBookingsAsync(string userId);
         Task<Result> CancelAsync(int bookingId,string userId);
+        Task ConfirmBookingAsync(int bookingId);
     }
 }

@@ -130,6 +130,18 @@ namespace BookingService.Infrastructure.Service
             return Result.Ok("Reserve Cancelled");
         }
 
+        public async Task ConfirmBookingAsync(int bookingId)
+        {
+            var booking = await _repository.GetByIdAsync(bookingId);
+
+            if (booking == null) throw new Exception("Booking not found");
+
+            booking.Status = BookingStatus.Confirmed;
+
+            await _repository.SaveChangesAsync();
+        }
+
+
 
         private bool HasDateConflict(Booking existingBooking, CreateBookingDto dto)
         {
