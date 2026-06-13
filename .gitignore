@@ -17,9 +17,6 @@ obj/
 packages/
 project.lock.json
 
-# ASP.NET
-appsettings.Development.json
-appsettings.json
 
 # Logs
 *.log
