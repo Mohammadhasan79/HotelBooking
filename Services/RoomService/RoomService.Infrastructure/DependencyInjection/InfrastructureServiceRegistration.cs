@@ -28,10 +28,11 @@ namespace RoomService.Infrastructure.DependencyInjection
             });
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IRoomService, RoomServiceManagement>();
-            services.AddHttpClient<IHotelApiClient, HotelApiClient>(client =>
+            services.AddHttpClient<IHotelApiClient, HotelApiClient>((sp, client) =>
             {
-                client.BaseAddress =
-                    new Uri("https://localhost:7273/");
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var baseUrl = configuration["ExternalServices:HotelServiceBaseUrl"];
+                client.BaseAddress = new Uri(baseUrl!);
             });
             return services;
         }

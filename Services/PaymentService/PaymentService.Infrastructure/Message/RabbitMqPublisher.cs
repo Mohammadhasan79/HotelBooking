@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using PaymentService.Application.Interfaces;
 using RabbitMQ.Client;
 
@@ -11,11 +8,18 @@ namespace PaymentService.Infrastructure.Message
 {
     public class RabbitMqPublisher : IMessagePublisher
     {
+        private readonly IConfiguration _configuration;
+
+        public RabbitMqPublisher(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public async Task PublishAsync<T>(T message)
         {
             var factory = new ConnectionFactory()
             {
-                HostName = "localhost"
+                HostName = _configuration["RabbitMQ:HostName"] ?? "localhost"
             };
 
             using var connection = await factory.CreateConnectionAsync();

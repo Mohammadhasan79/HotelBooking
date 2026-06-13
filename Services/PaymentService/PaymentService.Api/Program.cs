@@ -1,10 +1,12 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PaymentService.Api.Contollers;
 using PaymentService.Infrastructure.DependencyInjection;
 using PaymentService.Infrastructure.Message;
+using PaymentService.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +82,13 @@ builder.Services.AddControllers().AddApplicationPart(typeof(PaymentsController).
 builder.Services.AddHostedService<BookingCreatedConsumer>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<PaymentDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

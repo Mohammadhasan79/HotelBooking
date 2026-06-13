@@ -4,8 +4,7 @@ namespace IdentityService.Infrastructure.Seed;
 
 public static class RoleSeeder
 {
-    public static async Task SeedAsync(
-        RoleManager<IdentityRole> roleManager)
+    public static async Task SeedAsync(RoleManager<IdentityRole> roleManager)
     {
         if (!await roleManager.RoleExistsAsync("Admin"))
         {

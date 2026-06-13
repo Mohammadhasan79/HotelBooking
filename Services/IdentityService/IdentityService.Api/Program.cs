@@ -11,6 +11,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.Models;
 using IdentityService.Api.Middlewares;
+using IdentityService.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+using IdentityService.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +87,12 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -92,13 +101,26 @@ if (app.Environment.IsDevelopment())
 }
 using (var scope = app.Services.CreateScope())
 {
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+
     var roleManager =
         scope.ServiceProvider
         .GetRequiredService<RoleManager<IdentityRole>>();
 
     await RoleSeeder.SeedAsync(roleManager);
 }
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
 
+    var userManager =
+        scope.ServiceProvider
+        .GetRequiredService<UserManager<ApplicationUser>>();
+
+    await UserSeeder.SeedAsync(userManager);
+}
 app.UseHttpsRedirection();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseAuthentication();

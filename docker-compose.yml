@@ -1,0 +1,123 @@
+version: '3.9'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      SA_PASSWORD: "YourStrongPassword123!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrongPassword123!' -Q 'SELECT 1' -No"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  identityservice:
+    build:
+      context: .
+      dockerfile: Services/IdentityService/IdentityService.Api/Dockerfile
+    ports:
+      - "7001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=HotelIdentityDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+
+  hotelservice:
+    build:
+      context: .
+      dockerfile: Services/HotelService/HotelService.Api/Dockerfile
+    ports:
+      - "7002:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=HotelServiceDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+
+  roomservice:
+    build:
+      context: .
+      dockerfile: Services/RoomService/RoomService.Api/Dockerfile
+    ports:
+      - "7003:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ExternalServices__HotelServiceBaseUrl=http://hotelservice:8080/
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=RoomServiceDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+
+  bookingservice:
+    build:
+      context: .
+      dockerfile: Services/BookingService/BookingService.Api/Dockerfile
+    ports:
+      - "7004:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ExternalServices__RoomServiceBaseUrl=http://roomservice:8080/
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=BookingServiceDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+
+  paymentservice:
+    build:
+      context: .
+      dockerfile: Services/PaymentService/PaymentService.Api/Dockerfile
+    ports:
+      - "7005:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=PaymentServiceDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
+      - RabbitMQ__HostName=rabbitmq
+
+  apigateway:
+    build:
+      context: .
+      dockerfile: ApiGateway/Dockerfile
+    ports:
+      - "7068:8080"
+    depends_on:
+      - identityservice
+      - hotelservice
+      - roomservice
+      - bookingservice
+      - paymentservice

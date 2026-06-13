@@ -27,11 +27,12 @@ namespace BookingService.Infrastructure.DependencyInjection
             });
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IBookingService, BookingServiceManagement>();
-            services.AddHttpClient<IRoomApiClient,RoomApiClient>(client =>
-                {
-                    client.BaseAddress =
-                        new Uri("https://localhost:7289/");
-                });
+            services.AddHttpClient<IRoomApiClient, RoomApiClient>((sp, client) =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                var baseUrl = configuration["ExternalServices:RoomServiceBaseUrl"];
+                client.BaseAddress = new Uri(baseUrl!);
+            });
             services.AddScoped<IMessagePublisher, RabbitMqPublisher>();
 
             return services;

@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -17,80 +18,85 @@ namespace PaymentService.Infrastructure.Message
     public class BookingCreatedConsumer : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IConfiguration _configuration;
         private IConnection? _connection;
         private IChannel? _channel;
 
-        public BookingCreatedConsumer(IServiceScopeFactory scopeFactory)
+        public BookingCreatedConsumer(IServiceScopeFactory scopeFactory, IConfiguration configuration)
         {
             _scopeFactory = scopeFactory;
+            _configuration = configuration;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var factory = new ConnectionFactory()
+            while (!stoppingToken.IsCancellationRequested)
             {
-                HostName = "localhost"
-            };
-
-            _connection = await factory.CreateConnectionAsync(stoppingToken);
-            _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
-
-            await _channel.QueueDeclareAsync(
-                queue: "booking-created",
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                cancellationToken: stoppingToken);
-
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-
-            consumer.ReceivedAsync += async (sender, eventArgs) =>
-            {
-                var body = eventArgs.Body.ToArray();
-                var json = Encoding.UTF8.GetString(body);
-                var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(json);
-
-                using var scope = _scopeFactory.CreateScope();
-                var repository = scope.ServiceProvider
-                    .GetRequiredService<IPaymentRepository>();
-
                 try
                 {
-                    var payment = new Payment
+                    var factory = new ConnectionFactory()
                     {
-                        BookingId = bookingEvent!.BookingId,
-                        UserId = bookingEvent.UserId,
-                        Amount = bookingEvent.TotalPrice,
-                        Status = PaymentStatus.Pending,
-                        CreatedAt = DateTime.UtcNow
+                        HostName = _configuration["RabbitMQ:HostName"] ?? "localhost"
                     };
+                    _connection = await factory.CreateConnectionAsync(stoppingToken);
+                    _channel = await _connection.CreateChannelAsync(cancellationToken: stoppingToken);
+                    await _channel.QueueDeclareAsync(
+                        queue: "booking-created",
+                        durable: true,
+                        exclusive: false,
+                        autoDelete: false,
+                        cancellationToken: stoppingToken);
+                    var consumer = new AsyncEventingBasicConsumer(_channel);
+                    consumer.ReceivedAsync += async (sender, eventArgs) =>
+                    {
+                        var body = eventArgs.Body.ToArray();
+                        var json = Encoding.UTF8.GetString(body);
+                        var bookingEvent = JsonSerializer.Deserialize<BookingCreatedEvent>(json);
+                        using var scope = _scopeFactory.CreateScope();
+                        var repository = scope.ServiceProvider
+                            .GetRequiredService<IPaymentRepository>();
+                        try
+                        {
+                            var payment = new Payment
+                            {
+                                BookingId = bookingEvent!.BookingId,
+                                UserId = bookingEvent.UserId,
+                                Amount = bookingEvent.TotalPrice,
+                                Status = PaymentStatus.Pending,
+                                CreatedAt = DateTime.UtcNow
+                            };
+                            await repository.AddAsync(payment);
+                            await repository.SaveChangesAsync();
+                            await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                        }
+                        catch
+                        {
+                            await _channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                        }
+                    };
+                    await _channel.BasicConsumeAsync(
+                        queue: "booking-created",
+                        autoAck: false,
+                        consumer: consumer,
+                        cancellationToken: stoppingToken);
 
-                    await repository.AddAsync(payment);
-                    await repository.SaveChangesAsync();
-
-                    await _channel.BasicAckAsync(eventArgs.DeliveryTag, multiple: false);
+                    break;
                 }
-                catch
+                catch (Exception) when (!stoppingToken.IsCancellationRequested)
                 {
-                    await _channel.BasicNackAsync(eventArgs.DeliveryTag, multiple: false, requeue: true);
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
                 }
-            };
+            }
 
-            await _channel.BasicConsumeAsync(
-                queue: "booking-created",
-                autoAck: false,
-                consumer: consumer,
-                cancellationToken: stoppingToken);
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             if (_channel is not null)
                 await _channel.CloseAsync(cancellationToken);
-
             if (_connection is not null)
                 await _connection.CloseAsync(cancellationToken);
-
             await base.StopAsync(cancellationToken);
         }
     }
