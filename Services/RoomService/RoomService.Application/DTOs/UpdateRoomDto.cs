@@ -10,6 +10,7 @@ namespace RoomService.Application.DTOs
     {
         public string Title { get; set; } = string.Empty;
         public decimal PricePernight { get; set; }
+        public string? Url { get; set; } = string.Empty;
         public int Capacity { get; set; }
         public bool IsAvailable { get; set; } = true;
     }

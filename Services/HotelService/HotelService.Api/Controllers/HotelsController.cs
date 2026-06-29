@@ -1,4 +1,5 @@
 ﻿using HotelService.Application.DTOs.Hotel;
+using HotelService.Application.DTOs.HotelAndRoom;
 using HotelService.Application.ServiceInterface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,13 @@ namespace HotelService.Api.Controllers
         {
             _hotelService = hotelService;
         }
-
+        [HttpPost("[action]")]
+        public async Task<IActionResult> SearchByCityAndDate(SearchByCityAndDateDto dto)
+        {
+            var result = await _hotelService.SearchAvailableHotelRoom(dto);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {

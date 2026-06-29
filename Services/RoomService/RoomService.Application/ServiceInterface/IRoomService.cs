@@ -16,5 +16,6 @@ namespace RoomService.Application.ServiceInterface
         Task<Result<List<RoomDto>>> GetAllAsync();
         Task<Result<List<RoomDto>>> GetByHotelIdAsync(int hotelId);
         Task<Result<RoomDto>> GetByIdAsync(int id);
+        Task<Result<List<RoomDto>>> GetByHoteList(List<int> hotelsId);
     }
 }

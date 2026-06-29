@@ -14,6 +14,7 @@ namespace RoomService.Application.RepositoryInterface
         void Delete(Room room);
         Task<List<Room>> GetAllAsync();
         Task<List<Room>> GetByHotelIdAsync(int id);
+        Task<List<Room>> GetByHotelsIdAsync(List<int> hotelsId);
         Task<Room?> GetByIdAsync(int id);
         Task SaveChangesAsync();
     }

@@ -27,6 +27,10 @@ namespace HotelService.Application.Validators
             RuleFor(x => x.Description)
                 .NotEmpty()
                 .MaximumLength(1000);
+
+            RuleFor(x => x.Url)
+                .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
+                .WithMessage("ImageUrl must be a valid URL");
         }
     }
 }

@@ -11,6 +11,7 @@ namespace PaymentService.Application.Interfaces
     {
         Task AddAsync(Payment payment);
         Task<Payment?> GetByIdAsync(int id);
+        Task<List<Payment>> GetAllPayment();
         Task SaveChangesAsync();
     }
 }

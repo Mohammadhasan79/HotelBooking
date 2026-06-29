@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PaymentService.Application.DTOs;
 using PaymentService.Application.Interfaces;
+using PaymentService.Domain.Entities;
 using PaymentService.Domain.Enums;
 using Shared.Contracts.Events;
 
@@ -19,7 +21,19 @@ namespace PaymentService.Infrastructure.Services
             _repository = repository;
             _publisher = publisher;
         }
-
+        public async Task<List<ShowPayment>> GetAllPaymentAsync()
+        {
+            var payment = await _repository.GetAllPayment();
+            return payment.Select(x => new ShowPayment
+            {
+                Id = x.Id,
+                BookingId = x.BookingId,
+                UserId = x.UserId,
+                Amount = x.Amount,
+                Status = x.Status,
+                CreatedAt = x.CreatedAt
+            }).ToList();
+            }
         public async Task CompletePaymentAsync(int paymentId)
         {
             var payment = await _repository.GetByIdAsync(paymentId);

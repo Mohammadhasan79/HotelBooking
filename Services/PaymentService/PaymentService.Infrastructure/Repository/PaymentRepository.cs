@@ -28,7 +28,10 @@ namespace PaymentService.Infrastructure.Repository
         {
             return await _context.Payments.FirstOrDefaultAsync(x => x.Id == id);
         }
-
+        public async Task<List<Payment>> GetAllPayment()
+        {
+            return await _context.Payments.ToListAsync();
+        }
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

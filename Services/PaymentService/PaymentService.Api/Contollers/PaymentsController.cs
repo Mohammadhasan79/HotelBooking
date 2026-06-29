@@ -18,6 +18,13 @@ namespace PaymentService.Api.Contollers
         {
             _paymentService = paymentService;
         }
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllPayment()
+        {
+            var payment = await _paymentService.GetAllPaymentAsync();
+            return Ok(payment);
+        }
         [HttpPost("{id}/complete")]
         public async Task<IActionResult> Complete(int id)
         {

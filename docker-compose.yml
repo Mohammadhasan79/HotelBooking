@@ -56,6 +56,8 @@ services:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - ExternalServices__RoomServiceBaseUrl=http://roomservice:8080/  
+      - ExternalServices__BookingServiceBaseUrl=http://bookingservice:8080/
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=HotelServiceDb;User Id=sa;Password=YourStrongPassword123!;TrustServerCertificate=True;
       - RabbitMQ__HostName=rabbitmq
 

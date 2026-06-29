@@ -43,5 +43,9 @@ namespace BookingService.Infrastructure.Repository
         {
             return await _context.Bookings.Where(x => x.UserId == userId).ToListAsync();
         }
+        public async Task<List<Booking>> GetBookingByIdList(List<int> roomId)
+        {
+            return await _context.Bookings.Where(b => roomId.Contains(b.RoomId)).ToListAsync();
+        }
     }
 }

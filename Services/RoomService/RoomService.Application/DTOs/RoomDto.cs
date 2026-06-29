@@ -11,6 +11,7 @@ namespace RoomService.Application.DTOs
         public int Id { get; set; }
         public int HotelId { get; set; }
         public string Title { get; set; } = string.Empty;
+        public string? Url { get; set; } = string.Empty;
         public decimal PricePernight { get; set; }
         public int Capacity { get; set; }
         public bool IsAvailable { get; set; } = true;

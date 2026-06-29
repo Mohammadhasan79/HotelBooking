@@ -58,7 +58,7 @@ namespace BookingService.Infrastructure.Service
                 if (booking.Status == BookingStatus.Cancelled)
                     continue;
 
-                if (HasDateConflict(booking,dto))
+                if (HasDateConflict(booking,dto.CheckInDate,dto.CheckOutDate))
                 {
                     return Result<BookingDto>.Fail("Room already booked for selected dates");
                 }
@@ -140,13 +140,34 @@ namespace BookingService.Infrastructure.Service
 
             await _repository.SaveChangesAsync();
         }
-
-
-
-        private bool HasDateConflict(Booking existingBooking, CreateBookingDto dto)
+        public async Task<Result<List<int>>> CheckAvailableRoomAsync(CheckAvailableDto roomsId)
         {
-            return dto.CheckInDate < existingBooking.CheckOutDate && dto.CheckOutDate > existingBooking.CheckInDate;
+            if (roomsId == null || !roomsId.RoomId.Any())
+                return Result<List<int>>.Fail("Room Not Exist");
+
+            var bookings = await _repository.GetBookingByIdList(roomsId.RoomId);
+
+            if (bookings == null || !bookings.Any())
+                return Result<List<int>>.Ok(roomsId.RoomId);
+
+            var conflictRoomIds = bookings
+                .Where(b => HasDateConflict(b, roomsId.CheckInTime, roomsId.CheckOutTime))
+                .Select(b => b.RoomId)
+                .Distinct()
+                .ToList();
+
+            var availableRoomIds = roomsId.RoomId
+                .Except(conflictRoomIds)
+                .ToList();
+
+            return Result<List<int>>.Ok(availableRoomIds);
         }
+
+        private bool HasDateConflict(Booking existingBooking, DateTime checkInDate, DateTime checkOutDate)
+        {
+            return checkInDate < existingBooking.CheckOutDate && checkOutDate > existingBooking.CheckInDate;
+        }
+
         
     }
 }

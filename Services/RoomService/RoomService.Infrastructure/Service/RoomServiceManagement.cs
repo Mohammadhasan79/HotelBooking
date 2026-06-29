@@ -86,5 +86,16 @@ namespace RoomService.Infrastructure.Service
 
             return Result<RoomDto>.Ok(_mapper.Map<RoomDto>(room));
         }
+        public async Task<Result<List<RoomDto>>> GetByHoteList(List<int> hotelsId)
+        {
+            if (hotelsId == null || !hotelsId.Any())
+                return Result<List<RoomDto>>.Fail("Data Entry is Null");
+
+            var rooms = await _roomRepository.GetByHotelsIdAsync(hotelsId);
+            if (rooms == null || !rooms.Any())
+                return Result<List<RoomDto>>.Fail("No Rooms Found For These Hotels");
+
+            return Result<List<RoomDto>>.Ok(_mapper.Map<List<RoomDto>>(rooms));
+        }
     }
 }

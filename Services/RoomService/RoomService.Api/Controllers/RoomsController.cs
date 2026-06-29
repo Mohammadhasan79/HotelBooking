@@ -27,9 +27,16 @@ namespace RoomService.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoomById(int id)
         {
-            var resut = await _roomService.GetByIdAsync(id);
-            if (!resut.Success) return BadRequest(resut);
-            return Ok(resut);
+            var result = await _roomService.GetByIdAsync(id);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+        [HttpPost("by-hotels")]
+        public async Task<IActionResult> GetByHotelIds([FromBody] List<int> hotelsId)
+        {
+            var result = await _roomService.GetByHoteList(hotelsId);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
         }
 
         [HttpGet("hotel/{hotelId}")]

@@ -27,6 +27,10 @@ namespace RoomService.Application.Validators
             RuleFor(x => x.Capacity)
                 .GreaterThan(0).WithMessage("Capacity must be greater than 0")
                 .LessThanOrEqualTo(20).WithMessage("Capacity must not exceed 20");
+
+            RuleFor(x => x.Url)
+                .Must(url => Uri.TryCreate(url, UriKind.Absolute, out _))
+                .WithMessage("ImageUrl must be a valid URL");
         }
     }
 }

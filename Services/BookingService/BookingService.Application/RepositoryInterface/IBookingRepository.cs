@@ -14,6 +14,7 @@ namespace BookingService.Application.RepositoryInterface
         Task<Booking?> GetByIdAsync(int id);
         Task<List<Booking>> GetByUserIdAsync(string userId);
         Task<List<Booking>> GetByRoomIdAsync(int roomId);
+        Task<List<Booking>> GetBookingByIdList(List<int> roomId);
         Task SaveChangesAsync();
     }
 }

@@ -47,5 +47,9 @@ namespace RoomService.Infrastructure.Repository
         {
             await _context.SaveChangesAsync();
         }
+        public async Task<List<Room>> GetByHotelsIdAsync(List<int> hotelsId)
+        {
+            return await _context.Rooms.Where(r => hotelsId.Contains(r.HotelId)).ToListAsync();
+        }
     }
 }

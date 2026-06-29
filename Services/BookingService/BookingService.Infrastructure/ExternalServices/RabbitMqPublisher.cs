@@ -34,10 +34,7 @@ namespace BookingService.Infrastructure.ExternalServices
             var json = JsonSerializer.Serialize(message);
             var body = Encoding.UTF8.GetBytes(json);
 
-            await channel.BasicPublishAsync(
-                exchange: "",
-                routingKey: "booking-created",
-                body: body);
+            await channel.BasicPublishAsync(exchange: "",routingKey: "booking-created",body: body);
         }
     }
 }

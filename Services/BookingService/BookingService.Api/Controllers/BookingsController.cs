@@ -45,6 +45,14 @@ namespace BookingService.Api.Controllers
 
             return Ok(result);
         }
+        [HttpPost("[action]")]
+        public async Task<IActionResult> CheckAvailableRoom([FromBody] CheckAvailableDto roomId)
+        {
+            var result = await _bookingService.CheckAvailableRoomAsync(roomId);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+
         [Authorize]
         [HttpGet("my")]
         public async Task<IActionResult> MyBookings()

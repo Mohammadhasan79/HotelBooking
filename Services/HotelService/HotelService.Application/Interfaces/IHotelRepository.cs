@@ -15,6 +15,7 @@ namespace HotelService.Application.Interfaces
         void Delete(Hotel hotel);
         Task<List<Hotel>> GetAllAsync();
         Task<Hotel?> GetByIdAsync(int id);
+        Task<List<Hotel>> GetByCityAsync(string ccity);
         Task SaveChangesAsync();    
     }
 }

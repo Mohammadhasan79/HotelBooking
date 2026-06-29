@@ -34,6 +34,10 @@ public class HotelRepository : IHotelRepository
     {
         return await _context.Hotels.FirstOrDefaultAsync(a => a.Id == id);
     }
+    public async Task<List<Hotel>> GetByCityAsync(string city)
+    {
+        return await _context.Hotels.Where(h =>h.City == city).ToListAsync();
+    }
     public async Task SaveChangesAsync()
     {
        await _context.SaveChangesAsync();
