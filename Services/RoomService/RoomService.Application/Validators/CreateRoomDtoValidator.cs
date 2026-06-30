@@ -22,7 +22,7 @@ namespace RoomService.Application.Validators
 
             RuleFor(x => x.PricePernight)
                 .GreaterThan(0).WithMessage("Price must be greater than 0")
-                .LessThanOrEqualTo(100000).WithMessage("Price seems too high");
+                .LessThanOrEqualTo(10000000000).WithMessage("Price seems too high");
 
             RuleFor(x => x.Capacity)
                 .GreaterThan(0).WithMessage("Capacity must be greater than 0")
